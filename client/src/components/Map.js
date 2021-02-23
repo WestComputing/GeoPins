@@ -5,6 +5,7 @@ import { withStyles } from "@material-ui/core/styles";
 // import Typography from "@material-ui/core/Typography";
 // import DeleteIcon from "@material-ui/icons/DeleteTwoTone";
 import API_KEYS from '../ENV';
+import Blog from "./Blog";
 import Context from "../context";
 import PinIcon from "./PinIcon";
 
@@ -35,16 +36,15 @@ const Map = ({ classes }) => {
   }, []);
 
   const handleMapClick = ({ lngLat, leftButton }) => {
-    if (leftButton) {
-      if (!state.draft) {
-        dispatch({ type: "CREATE_DRAFT" });
-      }
-      const [longitude, latitude] = lngLat;
-      dispatch({
-        type: "UPDATE_DRAFT_LOCATION",
-        payload: { longitude, latitude }
-      });
+    if (!leftButton) return;
+    if (!state.draft) {
+      dispatch({ type: "CREATE_DRAFT" });
     }
+    const [longitude, latitude] = lngLat;
+    dispatch({
+      type: "UPDATE_DRAFT_LOCATION",
+      payload: { longitude, latitude }
+    });
   };
 
   return (
@@ -84,6 +84,7 @@ const Map = ({ classes }) => {
           </Marker>
         )}
       </ReactMapGL>
+      <Blog/>
     </div>
   );
 };
