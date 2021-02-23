@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import axios from 'axios';
 import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -15,17 +16,30 @@ const CreatePin = ({ classes }) => {
   const [image, setImage] = useState("");
   const [content, setContent] = useState("");
 
+  const handleImageUpload = async () => {
+    const data = new FormData();
+    data.append("file", image);
+    data.append("upload_preset", "geopins");
+    data.append("cloud_name", "west221b");
+    const res = await axios.post(
+      "https://api.cloudinary.com/v1_1/west221b/image/upload",
+      data
+    );
+    return res.data.url;
+  };
+
   const handleDeleteDraft = () => {
     setTitle("");
     setImage("");
     setContent("");
     dispatch({ type: "DELETE_DRAFT" });
-  }
+  };
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault();
-    console.log({ title, content, image });
-  }
+    const url = await handleImageUpload();
+    console.log({ title, content, url, image });
+  };
 
   return (
     <form className={classes.form}>
@@ -79,11 +93,9 @@ const CreatePin = ({ classes }) => {
           className={classes.button}
           variant="contained"
           color="primary"
+          onClick={handleDeleteDraft}
         >
-          <ClearIcon
-            className={classes.leftIcon}
-            onClick={handleDeleteDraft}
-          />
+          <ClearIcon className={classes.leftIcon}/>
           Discard
         </Button>
         <Button
