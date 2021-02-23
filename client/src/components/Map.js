@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ReactMapGL, { NavigationControl, Marker } from 'react-map-gl';
 import { withStyles } from "@material-ui/core/styles";
 // import Button from "@material-ui/core/Button";
 // import Typography from "@material-ui/core/Typography";
 // import DeleteIcon from "@material-ui/icons/DeleteTwoTone";
 import API_KEYS from '../ENV';
+import Context from "../context";
 import PinIcon from "./PinIcon";
 
 const INITIAL_VIEWPORT = {
@@ -15,6 +16,7 @@ const INITIAL_VIEWPORT = {
 
 
 const Map = ({ classes }) => {
+  const { state, dispatch } = useContext(Context);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
 
@@ -32,6 +34,19 @@ const Map = ({ classes }) => {
     getUserPosition();
   }, []);
 
+  const handleMapClick = ({ lngLat, leftButton }) => {
+    if (leftButton) {
+      if (!state.draft) {
+        dispatch({ type: "CREATE_DRAFT" });
+      }
+      const [longitude, latitude] = lngLat;
+      dispatch({
+        type: "UPDATE_DRAFT_LOCATION",
+        payload: { longitude, latitude }
+      });
+    }
+  };
+
   return (
     <div className={classes.root}>
       <ReactMapGL
@@ -41,6 +56,7 @@ const Map = ({ classes }) => {
         mapStyle="mapbox://styles/mapbox/streets-v9"
         {...viewport}
         onViewportChange={newViewport => setViewport(newViewport)}
+        onClick={handleMapClick}
       >
         <div className={classes.navigationControl}>
           <NavigationControl
@@ -55,6 +71,16 @@ const Map = ({ classes }) => {
             offsetTop={-37}
           >
             <PinIcon size={40} color="orange"/>
+          </Marker>
+        )}
+        {state.draft && (
+          <Marker
+            latitude={state.draft.latitude}
+            longitude={state.draft.longitude}
+            offsetLeft={-19}
+            offsetTop={-37}
+          >
+            <PinIcon size={40} color="hotpink"/>
           </Marker>
         )}
       </ReactMapGL>
