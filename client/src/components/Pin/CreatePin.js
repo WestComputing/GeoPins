@@ -1,5 +1,7 @@
 import React, { useState, useContext } from "react";
+import { GraphQLClient } from "graphql-request";
 import axios from 'axios';
+
 import { withStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -8,13 +10,16 @@ import AddAPhotoIcon from "@material-ui/icons/AddAPhotoTwoTone";
 import LandscapeIcon from "@material-ui/icons/LandscapeOutlined";
 import ClearIcon from "@material-ui/icons/Clear";
 import SaveIcon from "@material-ui/icons/SaveTwoTone";
+
 import Context from "../../context";
+import { CREATE_PIN_MUTATION } from "../../graphql/mutations";
 
 const CreatePin = ({ classes }) => {
-  const { dispatch } = useContext(Context);
+  const { state, dispatch } = useContext(Context);
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [content, setContent] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleImageUpload = async () => {
     const data = new FormData();
@@ -37,8 +42,24 @@ const CreatePin = ({ classes }) => {
 
   const handleSubmit = async event => {
     event.preventDefault();
-    const url = await handleImageUpload();
-    console.log({ title, content, url, image });
+    setSubmitting(true);
+    try {
+      const url = image
+        ? await handleImageUpload()
+        : "https://askleo.askleomedia.com/wp-content/uploads/2004/06/no_image-300x245.jpg";
+      const idToken = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token;
+      const client = new GraphQLClient("http://localhost:4000/graphql", {
+        headers: { authorization: idToken }
+      });
+      const { latitude, longitude } = state.draft;
+      const variables = { title, image: url, content, latitude, longitude };
+      const { createPin } = await client.request(CREATE_PIN_MUTATION, variables);
+      console.log("Pin created:", { createPin });
+      handleDeleteDraft()
+    } catch (error) {
+      console.error("Error creating pin:", error);
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -103,7 +124,7 @@ const CreatePin = ({ classes }) => {
           variant="contained"
           color="secondary"
           type="submit"
-          disabled={!title.trim()}
+          disabled={!title.trim() || submitting}
           onClick={handleSubmit}
         >
           Submit
