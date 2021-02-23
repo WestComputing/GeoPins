@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import OAUTH_CLIENT_ID from "../../ENV";
+import API_KEYS from "../../ENV";
 import { GraphQLClient } from "graphql-request";
 import { GoogleLogin } from "react-google-login";
 import { withStyles } from "@material-ui/core/styles";
@@ -39,7 +39,7 @@ const Login = ({ classes }) => {
       >
         Welcome
       </Typography>
-      <GoogleLogin clientId={OAUTH_CLIENT_ID}
+      <GoogleLogin clientId={API_KEYS.OAUTH_CLIENT_ID}
                    onSuccess={onSuccess}
                    onFailure={onFailure}
                    isSignedIn={true}
