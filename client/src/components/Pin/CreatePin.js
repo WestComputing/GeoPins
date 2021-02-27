@@ -50,8 +50,7 @@ const CreatePin = ({ classes }) => {
         : "https://askleo.askleomedia.com/wp-content/uploads/2004/06/no_image-300x245.jpg";
       const { latitude, longitude } = state.draft;
       const variables = { title, image: url, content, latitude, longitude };
-      const { createPin } = await client.request(CREATE_PIN_MUTATION, variables);
-      dispatch({type: "CREATE_PIN", payload: createPin});
+      await client.request(CREATE_PIN_MUTATION, variables);
       handleDeleteDraft();
     } catch (error) {
       console.error("Error creating pin:", error);

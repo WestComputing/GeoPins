@@ -24,14 +24,6 @@ export const CREATE_PIN_MUTATION = `
   }
 `;
 
-export const DELETE_PIN_MUTATION = `
-  mutation($pinId: ID!) {
-    deletePin(pinId: $pinId) {
-      _id
-    }
-  }
-`;
-
 export const CREATE_COMMENT_MUTATION = `
   mutation($pinId: ID!, $text: String!) {
     createComment(pinId: $pinId, text: $text) {
@@ -54,6 +46,14 @@ export const CREATE_COMMENT_MUTATION = `
           picture
         }
       }
+    }
+  }
+`;
+
+export const DELETE_PIN_MUTATION = `
+  mutation($pinId: ID!) {
+    deletePin(pinId: $pinId) {
+      _id
     }
   }
 `;
