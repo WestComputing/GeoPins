@@ -23,6 +23,9 @@ module.exports = {
         author: ctx.currentUser._id
       }).save();
       return await Pin.populate(newPin, "author");
+    }),
+    deletePin: authenticated(async (root, args, ctx) => {
+      return await Pin.findOneAndDelete({ _id: args.pinId }).exec()
     })
   }
 };
