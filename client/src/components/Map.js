@@ -32,7 +32,6 @@ const INITIAL_VIEWPORT = {
   zoom: 13
 }
 
-
 const Map = ({ classes }) => {
   const mobileSize = useMediaQuery("(max-width: 650px)");
   const client = useClient();
@@ -40,6 +39,15 @@ const Map = ({ classes }) => {
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
   const [popup, setPopup] = useState(null);
+
+  // Delete popup when pin deleted by another user
+  useEffect(() => {
+    const pinExists =
+      popup && state.pins.findIndex(pin => pin._id === popup._id) > -1;
+    if (!pinExists) {
+      setPopup(null);
+    }
+  }, [state.pins.length]);
 
   const getUserPosition = () => {
     if ("geolocation" in navigator) {

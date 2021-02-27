@@ -23,7 +23,9 @@ export default function reducer(state, { type, payload }) {
     case "DELETE_PIN":
       const deletedPin = payload
       const filteredPins = state.pins.filter(pin => pin._id !== deletedPin._id);
-      return { ...state, pins: filteredPins, currentPin: null }
+      return state.currentPin._id === deletedPin._id
+        ? { ...state, pins: filteredPins, currentPin: null }
+        : { ...state, pins: filteredPins }
     case "CREATE_COMMENT":
       const updatedCurrentPin = payload;
       const updatedPins = state.pins.map(pin =>
