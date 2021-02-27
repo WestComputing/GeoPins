@@ -1,18 +1,23 @@
 import React, { useContext } from "react";
-import API_KEYS from "../../ENV";
+
 import { GraphQLClient } from "graphql-request";
 import { GoogleLogin } from "react-google-login";
+
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 
+import API_KEYS from "../../ENV";
 import Context from "../../context";
-import { ME_QUERY } from "../../graphql/queries";
 import { BASE_URL } from "../../client";
+import { ME_QUERY } from "../../graphql/queries";
 
 const Login = ({ classes }) => {
   const { dispatch } = useContext(Context);
 
-  const onFailure = error => console.log("Error logging in:", error);
+  const onFailure = error => {
+    console.log("Error logging in:", error);
+    dispatch({ type: "IS_LOGGED_IN", payload: false });
+  };
 
   const onSuccess = async googleUser => {
     try {
@@ -22,11 +27,11 @@ const Login = ({ classes }) => {
       });
       const { me } = await client.request(ME_QUERY);
       dispatch({ type: "LOGIN_USER", payload: me });
-      dispatch({ type: "IS_LOGGED_IN", payload: googleUser.isSignedIn() })
+      dispatch({ type: "IS_LOGGED_IN", payload: googleUser.isSignedIn() });
     } catch (error) {
       onFailure(error);
     }
-  }
+  };
 
   return (
     <div className={classes.root}>
